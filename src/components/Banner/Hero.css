@@ -1,0 +1,30 @@
+.hero-container {
+  position: relative;
+  width: 100%;
+  height: 450px; /* Độ cao banner */
+  overflow: hidden;
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Giúp ảnh không bị méo khi co giãn */
+}
+
+.hero-content {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-content h1 { font-size: 3rem; margin-bottom: 10px; }
+.hero-content p { font-size: 1.5rem; margin-bottom: 20px; }
+/* Responsive cho điện thoại */
+@media (max-width: 768px) {
+  .hero-container { height: 250px; }
+  .hero-content h1 { font-size: 1.5rem; }
+  .hero-content { left: 5%; }
+}
