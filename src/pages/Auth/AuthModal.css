@@ -1,0 +1,110 @@
+.auth-page {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: url('your-bg-image.jpg') no-repeat center center/cover; /* Ảnh nền web của bạn */
+}
+
+.blur-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px); /* Làm mờ nền cực đẹp */
+  z-index: 1;
+}
+
+.auth-container {
+  position: relative;
+  z-index: 2;
+  background: white;
+  width: 400px;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.auth-tabs {
+  display: flex;
+  position: relative;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #eee;
+}
+
+.tab-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #888;
+  transition: 0.3s;
+}
+
+.tab-btn.active {
+  color: #0088cc; /* Màu xanh bạn chọn cho Shopmee */
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: -2px;
+  width: 50%;
+  height: 2px;
+  background: #0088cc;
+  transition: 0.3s ease-in-out;
+}
+
+.tab-indicator.left { left: 0; }
+.tab-indicator.right { left: 50%; }
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.input-group { margin-bottom: 15px; }
+.input-group label { display: block; margin-bottom: 5px; }
+.input-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #0088cc;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.auth-footer-links {
+  display: flex;
+  justify-content: space-between; /* Đẩy 2 cái ra 2 đầu */
+  margin-top: 20px;
+  align-items: center;
+}
+
+.small-link {
+  font-size: 0.85rem;
+  color: #666;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.small-link:hover {
+  color: #0088cc; /* Màu xanh Shopmee */
+  text-decoration: underline;
+}
+
+/* Hiệu ứng chuyển đổi form mượt hơn */
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}

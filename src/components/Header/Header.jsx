@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom"; // 1. Import Link
 import "./Header.css";
 import logoImg from "../../assets/Logo-removebg.png";
 
@@ -13,19 +14,31 @@ function Header() {
     <header className="header-container">
       <nav className="navbar">
         <div className="navbar-content">
-          <img src={logoImg} alt="Logo" className="logo-image" />
+          {/* Bao logo bằng Link để nhấn vào quay về trang chủ */}
+          <Link to="/">
+            <img src={logoImg} alt="Logo" className="logo-image" />
+          </Link>
 
           <button className="menu-toggle" onClick={toggleMenu}>
             <span className={isMenuOpen ? "bar open" : "bar"}></span>
             <span className={isMenuOpen ? "bar open" : "bar"}></span>
             <span className={isMenuOpen ? "bar open" : "bar"}></span>
           </button>
+
           <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
-            <li><a href="#home">Trang chủ</a></li>
+            {/* 2. Thay href="#home" bằng to="/" */}
+            <li><Link to="/" onClick={() => setIsMenuOpen(false)}>Trang chủ</Link></li>
+            
+            {/* Với các phần cuộn trang trong cùng 1 trang, bạn có thể giữ thẻ <a> 
+                hoặc xử lý riêng, nhưng với trang Đăng Nhập thì bắt buộc dùng Link */}
             <li><a href="#products">Sản phẩm</a></li>
-            {/* <li className="cart-link"><a href="#cart">Giỏ hàng (0)</a></li> */}
-            <li><a href="#login">Đăng Nhập</a></li>
-            <li><a href="#register">Đăng Ký</a></li>
+            
+            {/* 3. Thay href="#login" bằng to="/login" */}
+            <li>
+              <Link to="/login" className="login-link" onClick={() => setIsMenuOpen(false)}>
+                Đăng Nhập
+              </Link>
+            </li>
           </ul>
         </div>
       </nav>
