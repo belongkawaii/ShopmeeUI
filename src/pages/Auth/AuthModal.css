@@ -95,8 +95,8 @@
 }
 
 .small-link:hover {
-  color: #0088cc; /* Màu xanh Shopmee */
-  text-decoration: underline;
+  color: rgb(81, 206, 247);
+  cursor: pointer;
 }
 
 /* Hiệu ứng chuyển đổi form mượt hơn */
