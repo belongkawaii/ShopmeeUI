@@ -1,7 +1,7 @@
 /* Tổng thể Header */
 .header-container {
   width: 100%;
-  position: block;
+  position: fixed;
   top: 0;
   z-index: 1000;
   background: white;
@@ -120,4 +120,20 @@
   height: 60px; /* Chỉnh độ cao tùy ý */
   width: auto;  /* Tự động chỉnh chiều rộng theo tỉ lệ */
   display: block;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.logout-link {
+  cursor: pointer;
+  color: #ef4444;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.logout-link:hover {
+  color: #dc2626;
 }

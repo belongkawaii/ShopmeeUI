@@ -1,27 +1,38 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import './App.css'
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import "./App.css";
+
 import MainLayout from "./layouts/MainLayout";
-import Home from "./pages/MainContent/Home"; // Trang chủ của bạn
-import AuthModal from "./pages/Auth/AuthModal"; // Trang đăng nhập của bạn
+
+import Home from "./pages/MainContent/Home";
+import AuthModal from "./pages/Auth/AuthModal";
+import ProductDetail from "./pages/ProductDetail/ProductDetail";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* 1. Trang Đăng nhập: Không nằm trong MainLayout nên sẽ không có Header/Footer */}
+        {/* Trang đăng nhập */}
         <Route path="/login" element={<AuthModal />} />
 
-        {/* 2. Các trang còn lại: Bọc trong MainLayout */}
-        <Route 
-          path="/" 
+        {/* Trang chủ */}
+        <Route
+          path="/"
           element={
             <MainLayout>
               <Home />
             </MainLayout>
-          } 
+          }
         />
 
-        {/* Bạn có thể thêm các trang khác như /cart, /profile vào đây và bọc MainLayout tương tự */}
+        {/* Trang chi tiết sản phẩm */}
+        <Route
+          path="/product/:id"
+          element={
+            <MainLayout>
+              <ProductDetail />
+            </MainLayout>
+          }
+        />
       </Routes>
     </Router>
   );
