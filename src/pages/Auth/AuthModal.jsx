@@ -14,52 +14,61 @@ function LoginForm() {
   const [error, setError] = useState("");
 
   async function handleLogin(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    setLoading(true);
-    setError("");
+  setLoading(true);
+  setError("");
 
-    try {
-      const response = await fetch(
-        "http://127.0.0.1:8000/api/v1/auth/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Accept: "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error(
-          result.message || "Đăng nhập thất bại"
-        );
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/api/v1/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
       }
+    );
 
-      localStorage.setItem(
-        "access_token",
-        result.data.access_token
+    const result = await response.json();
+
+    if (!result.success) {
+      throw new Error(
+        result.message || "Đăng nhập thất bại"
       );
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify(result.data.user)
-      );
-
-      navigate("/");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
     }
+
+    console.log(result.data.user);
+
+    const user = result.data.user;
+
+    localStorage.setItem(
+      "access_token",
+      result.data.access_token
+    );
+
+    localStorage.setItem(
+      "user",
+      JSON.stringify(user)
+    );
+
+    // Chuyển hướng theo role
+    if (user.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <form
@@ -143,6 +152,10 @@ function RegisterForm() {
       <div className="input-group">
         <label>Email</label>
         <input type="email" placeholder="Nhập email..." />
+      </div>
+      <div className="input-group">
+        <label>Số điện thoại</label>
+        <input type="tel" placeholder="Nhập số điện thoại..." />
       </div>
       <div className="input-group">
         <label>Mật khẩu</label>

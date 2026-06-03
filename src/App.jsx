@@ -6,15 +6,22 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/MainContent/Home";
 import AuthModal from "./pages/Auth/AuthModal";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import AdminLayout from "./layouts/AdminLayout";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Trang đăng nhập */}
+        {/* Login */}
         <Route path="/login" element={<AuthModal />} />
 
-        {/* Trang chủ */}
+        {/* Admin */}
+        <Route
+          path="/admin/*"
+          element={<AdminLayout />}
+        />
+
+        {/* Home */}
         <Route
           path="/"
           element={
@@ -24,7 +31,7 @@ function App() {
           }
         />
 
-        {/* Trang chi tiết sản phẩm */}
+        {/* Product Detail */}
         <Route
           path="/product/:id"
           element={
