@@ -1,14 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap');
+
 .hero-container {
   position: relative;
   width: 100%;
-  height: 450px; /* Độ cao banner */
+  height: 450px;
   overflow: hidden;
 }
 
 .hero-image {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Giúp ảnh không bị méo khi co giãn */
+  object-fit: fill;
 }
 
 .hero-content {
@@ -16,15 +18,140 @@
   top: 50%;
   left: 10%;
   transform: translateY(-50%);
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+
+  padding: 25px 35px;
+  border-radius: 20px;
 }
 
-.hero-content h1 { font-size: 3rem; margin-bottom: 10px; }
-.hero-content p { font-size: 1.5rem; margin-bottom: 20px; }
-/* Responsive cho điện thoại */
+/* TIÊU ĐỀ */
+.hero-content h1 {
+  font-family: "Montserrat", sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+
+  background: linear-gradient(
+    90deg,
+    #ff0000,
+    #ff9900,
+    #ffff00,
+    #00ff00,
+    #00ffff,
+    #0066ff,
+    #ff00ff,
+    #ff0000
+  );
+
+  background-size: 600% 100%;
+
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  -webkit-text-stroke: 2px rgba(0, 0, 0, 0.7);
+
+  text-shadow:
+    0 0 5px rgba(255,255,255,0.8),
+    0 0 10px rgba(255,255,255,0.7),
+    0 0 20px rgba(255,153,0,0.8),
+    0 0 30px rgba(255,0,102,0.7);
+
+  animation:
+    rainbowMove 6s linear infinite,
+    pulse 2s ease-in-out infinite,
+    glow 1.5s ease-in-out infinite alternate;
+}
+
+/* MÔ TẢ */
+.hero-content p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: white;
+
+  text-shadow:
+    0 0 5px rgba(255,255,255,0.5),
+    2px 2px 5px rgba(0,0,0,0.8);
+
+  animation: colorBlink 4s infinite;
+}
+
+/* Gradient chạy */
+@keyframes rainbowMove {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 600% 50%;
+  }
+}
+
+/* Phóng to thu nhỏ */
+@keyframes pulse {
+  0%,100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+/* Phát sáng */
+@keyframes glow {
+  from {
+    filter: drop-shadow(0 0 5px gold);
+  }
+
+  to {
+    filter: drop-shadow(0 0 20px orange);
+  }
+}
+
+/* Chữ mô tả đổi màu */
+@keyframes colorBlink {
+  0% {
+    color: #ffffff;
+  }
+
+  25% {
+    color: #ffd700;
+  }
+
+  50% {
+    color: #00ffff;
+  }
+
+  75% {
+    color: #ff66cc;
+  }
+
+  100% {
+    color: #ffffff;
+  }
+}
+
+/* Mobile */
 @media (max-width: 768px) {
-  .hero-container { height: 250px; }
-  .hero-content h1 { font-size: 1.5rem; }
-  .hero-content { left: 5%; }
+  .hero-container {
+    height: 250px;
+  }
+
+  .hero-content {
+    left: 5%;
+    padding: 15px 20px;
+  }
+
+  .hero-content h1 {
+    font-size: 1.5rem;
+    -webkit-text-stroke: 1px rgba(0, 0, 0, 0.7);
+  }
+
+  .hero-content p {
+    font-size: 1rem;
+  }
 }
