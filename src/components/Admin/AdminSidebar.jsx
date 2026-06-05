@@ -1,8 +1,10 @@
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { getAdminUser } from "../../pages/Admin/adminApi";
 import "../../pages/Admin/Admin.css";
 
 function AdminSidebar() {
   const navigate = useNavigate();
+  const user = getAdminUser();
 
   function handleLogout() {
     localStorage.removeItem("access_token");
@@ -13,36 +15,39 @@ function AdminSidebar() {
 
   return (
     <aside className="admin-sidebar">
-      <h2>Administrator</h2>
+      <div className="admin-brand">
+        <span className="admin-brand-mark">S</span>
+        <div>
+          <strong>Shopmee</strong>
+          <small>Admin</small>
+        </div>
+      </div>
 
-      <nav>
-        <Link to="/admin">
-          📊 Dashboard
-        </Link>
+      <div className="admin-profile">
+        <span>{user?.name?.charAt(0)?.toUpperCase() || "A"}</span>
+        <div>
+          <strong>{user?.name || "Administrator"}</strong>
+          <small>{user?.email || "admin"}</small>
+        </div>
+      </div>
 
-        <Link to="/admin/shops">
-          🏪 Shops
-        </Link>
+      <nav className="admin-nav">
+        <NavLink to="/admin" end>
+          Dashboard
+        </NavLink>
 
-        <Link to="/admin/orders">
-          🧾 Orders
-        </Link>
+        <NavLink to="/admin/shops">Shops</NavLink>
 
-        <Link to="/admin/users">
-          👤 Users
-        </Link>
-
-        <Link to="/admin/products">
-          📦 Products
-        </Link>
-
-        <button
-          className="sidebar-link logout-link"
-          onClick={handleLogout}
-        >
-          🚪 Đăng xuất
-        </button>
+        <NavLink to="/admin/orders">Orders</NavLink>
       </nav>
+
+      <button
+        className="admin-logout-button"
+        type="button"
+        onClick={handleLogout}
+      >
+        Đăng xuất
+      </button>
     </aside>
   );
 }

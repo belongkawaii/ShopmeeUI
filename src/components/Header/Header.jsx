@@ -3,14 +3,21 @@ import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import logoImg from "../../assets/Logo-removebg.png";
 
+function getStoredUser() {
+  try {
+    const storedUser = localStorage.getItem("user");
+
+    return storedUser ? JSON.parse(storedUser) : null;
+  } catch {
+    return null;
+  }
+}
+
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const navigate = useNavigate();
-
-  const user = JSON.parse(
-    localStorage.getItem("user")
-  );
+  const user = getStoredUser();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -29,54 +36,24 @@ function Header() {
       <nav className="navbar">
         <div className="navbar-content">
           <Link to="/">
-            <img
-              src={logoImg}
-              alt="Logo"
-              className="logo-image"
-            />
+            <img src={logoImg} alt="Logo" className="logo-image" />
           </Link>
 
-          <button
-            className="menu-toggle"
-            onClick={toggleMenu}
-          >
-            <span
-              className={
-                isMenuOpen ? "bar open" : "bar"
-              }
-            ></span>
-
-            <span
-              className={
-                isMenuOpen ? "bar open" : "bar"
-              }
-            ></span>
-
-            <span
-              className={
-                isMenuOpen ? "bar open" : "bar"
-              }
-            ></span>
+          <button className="menu-toggle" onClick={toggleMenu}>
+            <span className={isMenuOpen ? "bar open" : "bar"}></span>
+            <span className={isMenuOpen ? "bar open" : "bar"}></span>
+            <span className={isMenuOpen ? "bar open" : "bar"}></span>
           </button>
 
-          <ul
-            className={`nav-links ${
-              isMenuOpen ? "active" : ""
-            }`}
-          >
+          <ul className={`nav-links ${isMenuOpen ? "active" : ""}`}>
             <li>
-              <Link
-                to="/"
-                onClick={() =>
-                  setIsMenuOpen(false)
-                }
-              >
+              <Link to="/" onClick={() => setIsMenuOpen(false)}>
                 Trang chủ
               </Link>
             </li>
 
             <li>
-              <a href="#products">
+              <a href="#products" onClick={() => setIsMenuOpen(false)}>
                 Sản phẩm
               </a>
             </li>
@@ -86,31 +63,28 @@ function Header() {
                 <Link
                   to="/login"
                   className="login-link"
-                  onClick={() =>
-                    setIsMenuOpen(false)
-                  }
+                  onClick={() => setIsMenuOpen(false)}
                 >
                   Đăng nhập
                 </Link>
               </li>
             ) : (
               <>
-                <li className="user-name">
-                  Xin chào, {user.name}
+                <li>
+                  <span className="user-name">
+                    Xin chào, {user.name || user.email}
+                  </span>
                 </li>
 
                 <li>
-                    <a
-                      href="#"
-                      className="logout-link"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleLogout();
-                      }}
-                    >
-                      Đăng xuất
-                    </a>
-                  </li>
+                  <button
+                    type="button"
+                    className="logout-link"
+                    onClick={handleLogout}
+                  >
+                    Đăng xuất
+                  </button>
+                </li>
               </>
             )}
           </ul>

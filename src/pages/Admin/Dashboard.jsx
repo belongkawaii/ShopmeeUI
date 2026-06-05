@@ -1,77 +1,117 @@
 import { useEffect, useState } from "react";
+import { adminRequest } from "./adminApi";
 
 function Dashboard() {
   const [stats, setStats] = useState({
     shops: 0,
+    activeShops: 0,
+    pendingShops: 0,
     orders: 0,
-    users: 0,
-    products: 0,
   });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     async function loadData() {
+      setLoading(true);
+      setError("");
+
       try {
-        const token = localStorage.getItem("token");
-
-        const [shopsRes, ordersRes] = await Promise.all([
-          fetch(
-            "http://127.0.0.1:8000/api/v1/admin/shops",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          ),
-          fetch(
-            "http://127.0.0.1:8000/api/v1/admin/orders",
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            }
-          ),
-        ]);
-
-        const shops = await shopsRes.json();
-        const orders = await ordersRes.json();
+        const [shopsResult, activeShopsResult, pendingShopsResult, ordersResult] =
+          await Promise.all([
+            adminRequest("/admin/shops", { params: { limit: 1 } }),
+            adminRequest("/admin/shops", {
+              params: { status: "active", limit: 1 },
+            }),
+            adminRequest("/admin/shops", {
+              params: { status: "pending", limit: 1 },
+            }),
+            adminRequest("/admin/orders", { params: { limit: 1 } }),
+          ]);
 
         setStats({
-          shops: shops.meta?.total || 0,
-          orders: orders.meta?.total || 0,
-          users: 0,
-          products: 0,
+          shops: shopsResult.meta?.total || 0,
+          activeShops: activeShopsResult.meta?.total || 0,
+          pendingShops: pendingShopsResult.meta?.total || 0,
+          orders: ordersResult.meta?.total || 0,
         });
-      } catch (error) {
-        console.error("Lỗi Dashboard:", error);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
       }
     }
 
     loadData();
   }, []);
 
+  const statCards = [
+    {
+      label: "Tổng shop",
+      value: stats.shops,
+      tone: "blue",
+    },
+    {
+      label: "Shop hoạt động",
+      value: stats.activeShops,
+      tone: "green",
+    },
+    {
+      label: "Shop chờ duyệt",
+      value: stats.pendingShops,
+      tone: "amber",
+    },
+    {
+      label: "Tổng đơn hàng",
+      value: stats.orders,
+      tone: "rose",
+    },
+  ];
+
   return (
-    <div>
-      <h1>Dashboard</h1>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div>
+          <span className="admin-eyebrow">Tổng quan</span>
+          <h1>Dashboard</h1>
+        </div>
+      </div>
+
+      {error && <div className="admin-alert error">{error}</div>}
 
       <div className="stats-grid">
-        <div className="stat-card">
-          <h3>{stats.shops}</h3>
-          <p>Shops</p>
+        {statCards.map((item) => (
+          <div className={`stat-card ${item.tone}`} key={item.label}>
+            <span>{item.label}</span>
+            <strong>{loading ? "..." : item.value}</strong>
+          </div>
+        ))}
+      </div>
+
+      <div className="admin-panel">
+        <div className="admin-panel-header">
+          <div>
+            <h2>Trạng thái hệ thống</h2>
+          </div>
         </div>
 
-        <div className="stat-card">
-          <h3>{stats.orders}</h3>
-          <p>Orders</p>
-        </div>
-
-        <div className="stat-card">
-          <h3>{stats.users}</h3>
-          <p>Users</p>
-        </div>
-
-        <div className="stat-card">
-          <h3>{stats.products}</h3>
-          <p>Products</p>
+        <div className="admin-summary-list">
+          <div>
+            <span>Shop đang chờ xử lý</span>
+            <strong>{loading ? "..." : stats.pendingShops}</strong>
+          </div>
+          <div>
+            <span>Tỷ lệ shop hoạt động</span>
+            <strong>
+              {loading || stats.shops === 0
+                ? "0%"
+                : `${Math.round((stats.activeShops / stats.shops) * 100)}%`}
+            </strong>
+          </div>
+          <div>
+            <span>Đơn hàng ghi nhận</span>
+            <strong>{loading ? "..." : stats.orders}</strong>
+          </div>
         </div>
       </div>
     </div>

@@ -1,91 +1,236 @@
 import { useEffect, useState } from "react";
+import {
+  adminRequest,
+  formatDateTime,
+  getStatusClass,
+  getStatusLabel,
+  getTotalPages,
+} from "./adminApi";
+
+const PAGE_LIMIT = 10;
 
 function Orders() {
   const [orders, setOrders] = useState([]);
+  const [meta, setMeta] = useState({
+    current_page: 1,
+    per_page: PAGE_LIMIT,
+    total: 0,
+  });
+  const [page, setPage] = useState(1);
+  const [status, setStatus] = useState("");
+  const [shopIdInput, setShopIdInput] = useState("");
+  const [shopId, setShopId] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  
 
   useEffect(() => {
-    async function loadOrders() {
-      try {
-        const token = localStorage.getItem("token");
+  async function loadOrders() {
+    setLoading(true);
+    setError("");
 
-        const response = await fetch(
-          "http://127.0.0.1:8000/api/v1/admin/orders",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+    try {
+      const result = await adminRequest("/admin/orders", {
+        params: {
+          page,
+          limit: PAGE_LIMIT,
+          status,
+          shop_id: shopId,
+        },
+      });
 
-        const result = await response.json();
+      setOrders(result.data || []);
 
-        if (result.success) {
-          setOrders(result.data || []);
-        } else {
-          console.error(result.message);
-          setOrders([]);
+      setMeta(
+        result.meta || {
+          current_page: page,
+          per_page: PAGE_LIMIT,
+          total: 0,
         }
-      } catch (error) {
-        console.error(
-          "Lỗi lấy danh sách đơn hàng:",
-          error
-        );
-      }
+      );
+    } catch (err) {
+      setError(err.message);
+      setOrders([]);
+    } finally {
+      setLoading(false);
     }
+  }
 
-    loadOrders();
-  }, []);
+  loadOrders();
+}, [page, status, shopId]);
+
+  function handleStatusChange(e) {
+    setStatus(e.target.value);
+    setPage(1);
+  }
+
+  function handleApplyShopFilter(e) {
+    e.preventDefault();
+    setShopId(shopIdInput.trim());
+    setPage(1);
+  }
+
+  function clearFilters() {
+    setStatus("");
+    setShopId("");
+    setShopIdInput("");
+    setPage(1);
+  }
+
+  const totalPages = getTotalPages(meta);
 
   return (
-    <div>
-      <h1>Quản lý đơn hàng</h1>
+    <div className="admin-page">
+      <div className="admin-page-header">
+        <div>
+          <span className="admin-eyebrow">Đơn hàng</span>
+          <h1>Quản lý đơn hàng</h1>
+        </div>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Khách hàng</th>
-            <th>Trạng thái</th>
-            <th>Thanh toán</th>
-            <th>Số sản phẩm</th>
-            <th>Ngày tạo</th>
-          </tr>
-        </thead>
+        <div className="admin-page-total">
+          <span>Tổng</span>
+          <strong>{meta.total || 0}</strong>
+        </div>
+      </div>
 
-        <tbody>
-          {orders.length > 0 ? (
-            orders.map((order) => (
-              <tr key={order.id}>
-                <td>{order.id}</td>
+      <form className="admin-toolbar" onSubmit={handleApplyShopFilter}>
+        <label className="admin-field">
+          <span>Trạng thái</span>
+          <select value={status} onChange={handleStatusChange}>
+            <option value="">Tất cả</option>
+            <option value="pending">Chờ xử lý</option>
+            <option value="processing">Đang xử lý</option>
+            <option value="shipping">Đang giao</option>
+            <option value="completed">Hoàn tất</option>
+            <option value="cancelled">Đã hủy</option>
+          </select>
+        </label>
 
-                <td>
-                  {order.user?.name || "N/A"}
-                </td>
+        <label className="admin-field">
+          <span>Mã shop</span>
+          <input
+            type="number"
+            min="1"
+            placeholder="Nhập ID shop"
+            value={shopIdInput}
+            onChange={(e) => setShopIdInput(e.target.value)}
+          />
+        </label>
 
-                <td>{order.status}</td>
+        <button type="submit" className="admin-action-btn primary">
+          Lọc
+        </button>
 
-                <td>
-                  {order.payment_status}
-                </td>
+        <button
+          type="button"
+          className="admin-action-btn neutral"
+          onClick={clearFilters}
+        >
+          Xóa lọc
+        </button>
+      </form>
 
-                <td>
-                  {order.items_count}
-                </td>
+      {error && <div className="admin-alert error">{error}</div>}
 
-                <td>
-                  {order.created_at}
-                </td>
+      <div className="admin-panel">
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Khách hàng</th>
+                <th>Trạng thái</th>
+                <th>Thanh toán</th>
+                <th>Shop</th>
+                <th>Sản phẩm</th>
+                <th>Ngày tạo</th>
               </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="6">
-                Không có đơn hàng nào
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+            </thead>
+
+            <tbody>
+              {loading ? (
+                <tr>
+                  <td colSpan="7" className="admin-empty">
+                    Đang tải dữ liệu...
+                  </td>
+                </tr>
+              ) : orders.length > 0 ? (
+                orders.map((order) => (
+                  <tr key={order.id}>
+                    <td>#{order.id}</td>
+                    <td>
+                      <div className="admin-user-cell">
+                        <strong>{order.user?.name || "N/A"}</strong>
+                        <span>{order.user?.email || "N/A"}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <span
+                        className={`admin-status-pill ${getStatusClass(
+                          order.status
+                        )}`}
+                      >
+                        {getStatusLabel(order.status)}
+                      </span>
+                    </td>
+                    <td>
+                      <span
+                        className={`admin-status-pill ${getStatusClass(
+                          order.payment_status
+                        )}`}
+                      >
+                        {getStatusLabel(order.payment_status)}
+                      </span>
+                    </td>
+                    <td>
+                      {order.shop_ids?.length
+                        ? order.shop_ids.map((id) => (
+                            <span className="admin-chip" key={id}>
+                              #{id}
+                            </span>
+                          ))
+                        : "N/A"}
+                    </td>
+                    <td>{order.items_count || 0}</td>
+                    <td>{formatDateTime(order.created_at)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="admin-empty">
+                    Không có đơn hàng nào
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div className="admin-pagination">
+        <button
+          type="button"
+          className="admin-page-btn"
+          disabled={page <= 1}
+          onClick={() => setPage((current) => Math.max(current - 1, 1))}
+        >
+          Trước
+        </button>
+
+        <span>
+          Trang {page} / {totalPages}
+        </span>
+
+        <button
+          type="button"
+          className="admin-page-btn"
+          disabled={page >= totalPages}
+          onClick={() => setPage((current) => Math.min(current + 1, totalPages))}
+        >
+          Sau
+        </button>
+      </div>
     </div>
   );
 }
