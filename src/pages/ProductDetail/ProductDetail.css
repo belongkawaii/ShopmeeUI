@@ -111,3 +111,14 @@
   line-height: 1.7;
   color: #555;
 }
+
+.login-warning {
+  margin-top: 15px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #ea580c;
+  font-weight: 600;
+}

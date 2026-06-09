@@ -9,6 +9,8 @@ function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loginMessage, setLoginMessage] =
+  useState("");
 
   useEffect(() => {
     async function loadProduct() {
@@ -40,6 +42,23 @@ function ProductDetail() {
 
   function formatPrice(price) {
     return Number(price).toLocaleString("vi-VN") + " ₫";
+  }
+  function handleAddToCart() {
+    const token =
+      localStorage.getItem("access_token");
+
+    if (!token) {
+      setLoginMessage(
+        "⚠️ Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng."
+      );
+
+      return;
+    }
+
+    setLoginMessage("");
+
+    // Sau này gọi API thêm giỏ hàng ở đây
+    alert("Đã đăng nhập");
   }
 
   if (loading) {
@@ -122,9 +141,20 @@ function ProductDetail() {
           </div>
         </div>
 
-        <button className="add-cart-btn">
+        <>
+        {loginMessage && (
+          <div className="login-warning">
+            {loginMessage}
+          </div>
+        )}
+
+        <button
+          className="add-cart-btn"
+          onClick={handleAddToCart}
+        >
           Thêm vào giỏ hàng
         </button>
+      </>
 
         <div className="detail-description">
           <h3>Mô tả sản phẩm</h3>

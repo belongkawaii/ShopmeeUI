@@ -24,7 +24,11 @@ function Home() {
         return response.json();
       })
       .then(function (result) {
-        setProducts(result.data.data);
+        setProducts(
+        result.data.data.filter(
+          (product) => product.status === "active"
+        )
+      );
 
         setCurrentPage(result.data.meta.current_page);
         setLastPage(result.data.meta.last_page);
@@ -47,7 +51,11 @@ function Home() {
     )
       .then((response) => response.json())
       .then((result) => {
-        setProducts(result.data.data);
+        setProducts(
+        result.data.data.filter(
+          (product) => product.status === "active"
+        )
+      );
 
         setCurrentPage(
           result.data.meta.current_page
