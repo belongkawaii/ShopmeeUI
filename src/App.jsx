@@ -6,6 +6,7 @@ import MainLayout from "./layouts/MainLayout";
 import Home from "./pages/MainContent/Home";
 import AuthModal from "./pages/Auth/AuthModal";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
+import Cart from "./pages/Cart/Cart";
 import AdminLayout from "./layouts/AdminLayout";
 
 function App() {
@@ -37,6 +38,16 @@ function App() {
           element={
             <MainLayout>
               <ProductDetail />
+            </MainLayout>
+          }
+        />
+
+        {/* Cart */}
+        <Route
+          path="/cart"
+          element={
+            <MainLayout>
+              <Cart />
             </MainLayout>
           }
         />

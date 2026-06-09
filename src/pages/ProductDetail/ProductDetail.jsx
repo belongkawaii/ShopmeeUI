@@ -9,6 +9,7 @@ function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [quantity, setQuantity] = useState(1);
   const [loginMessage, setLoginMessage] =
   useState("");
 
@@ -43,7 +44,8 @@ function ProductDetail() {
   function formatPrice(price) {
     return Number(price).toLocaleString("vi-VN") + " ₫";
   }
-  function handleAddToCart() {
+
+  async function handleAddToCart() {
     const token =
       localStorage.getItem("access_token");
 
@@ -55,10 +57,45 @@ function ProductDetail() {
       return;
     }
 
+    if (!selectedVariant) {
+      setLoginMessage("⚠️ Vui lòng chọn phân loại sản phẩm.");
+      return;
+    }
+
+    if (quantity > selectedVariant.stock_quantity) {
+      setLoginMessage(`⚠️ Số lượng vượt quá tồn kho (Hiện có: ${selectedVariant.stock_quantity}).`);
+      return;
+    }
+
     setLoginMessage("");
 
-    // Sau này gọi API thêm giỏ hàng ở đây
-    alert("Đã đăng nhập");
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/cart/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          product_variant_id: selectedVariant.id,
+          quantity: quantity
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Dispatch custom event to notify Header
+        window.dispatchEvent(new Event("cartUpdated"));
+        setLoginMessage("🎉 Đã thêm sản phẩm vào giỏ hàng thành công!");
+      } else {
+        setLoginMessage(`❌ ${result.message || "Không thể thêm sản phẩm vào giỏ hàng."}`);
+      }
+    } catch (error) {
+      console.error("Lỗi thêm giỏ hàng:", error);
+      setLoginMessage("❌ Có lỗi xảy ra, vui lòng thử lại sau.");
+    }
   }
 
   if (loading) {
@@ -138,6 +175,41 @@ function ProductDetail() {
                 {variant.variant_name}
               </button>
             ))}
+          </div>
+        </div>
+
+        {/* QUANTITY */}
+        <div className="quantity-section">
+          <h3>Số lượng</h3>
+          <div className="quantity-selector">
+            <button
+              type="button"
+              className="qty-btn"
+              onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+              disabled={quantity <= 1}
+            >
+              -
+            </button>
+            <input
+              type="number"
+              className="qty-input"
+              value={quantity}
+              onChange={(e) => {
+                const val = parseInt(e.target.value);
+                if (val > 0) {
+                  setQuantity(Math.min(selectedVariant?.stock_quantity ?? 1, val));
+                }
+              }}
+              min="1"
+            />
+            <button
+              type="button"
+              className="qty-btn"
+              onClick={() => setQuantity((prev) => Math.min(selectedVariant?.stock_quantity ?? 1, prev + 1))}
+              disabled={quantity >= (selectedVariant?.stock_quantity ?? 0)}
+            >
+              +
+            </button>
           </div>
         </div>
 

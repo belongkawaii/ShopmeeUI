@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import logoImg from "../../assets/Logo-removebg.png";
@@ -15,6 +15,7 @@ function getStoredUser() {
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cartCount, setCartCount] = useState(0);
 
   const navigate = useNavigate();
   const user = getStoredUser();
@@ -22,6 +23,41 @@ function Header() {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  async function fetchCartCount() {
+    const token = localStorage.getItem("access_token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/api/v1/cart/count", {
+        headers: {
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`
+        }
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        setCartCount(result.count);
+      }
+    } catch (error) {
+      console.error("Lỗi lấy số lượng giỏ hàng:", error);
+    }
+  }
+
+  useEffect(() => {
+    if (user) {
+      fetchCartCount();
+    }
+
+    const handleCartUpdate = () => {
+      fetchCartCount();
+    };
+
+    window.addEventListener("cartUpdated", handleCartUpdate);
+    return () => {
+      window.removeEventListener("cartUpdated", handleCartUpdate);
+    };
+  }, []);
 
   function handleLogout() {
     localStorage.removeItem("access_token");
@@ -49,6 +85,13 @@ function Header() {
             <li>
               <Link to="/" onClick={() => setIsMenuOpen(false)}>
                 Trang chủ
+              </Link>
+            </li>
+
+            <li>
+              <Link to="/cart" className="cart-nav-link" onClick={() => setIsMenuOpen(false)}>
+                🛒 Giỏ hàng
+                {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
               </Link>
             </li>
 
