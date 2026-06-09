@@ -20,6 +20,8 @@ function Users() {
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [updatingId, setUpdatingId] = useState(null);
 
   useEffect(() => {
     async function fetchUsers() {
@@ -54,6 +56,46 @@ function Users() {
     fetchUsers();
   }, [page]);
 
+  async function reloadData() {
+  const result = await adminRequest("/admin/users", {
+    params: {
+      page,
+      limit: PAGE_LIMIT,
+    },
+  });
+
+  setUsers(result.data || []);
+  setMeta(result.meta || {});
+}
+async function updateUserStatus(userId, nextStatus) {
+  setUpdatingId(userId);
+  setError("");
+  setMessage("");
+
+  try {
+    const result = await adminRequest(
+      `/admin/users/${userId}`,
+      {
+        method: "PATCH",
+        body: {
+          status: nextStatus,
+        },
+      }
+    );
+
+    setMessage(
+      result.message ||
+        "Cập nhật trạng thái người dùng thành công."
+    );
+
+    await reloadData();
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setUpdatingId(null);
+  }
+}
+
   const totalPages = getTotalPages(meta);
 
   return (
@@ -71,6 +113,11 @@ function Users() {
       </div>
 
       {error && <div className="admin-alert error">{error}</div>}
+      {message && (
+        <div className="admin-alert success">
+          {message}
+        </div>
+      )}
 
       <div className="admin-panel">
         <div className="admin-table-wrap">
@@ -85,13 +132,14 @@ function Users() {
                 <th>Đơn hàng</th>
                 <th>Trạng thái</th>
                 <th>Ngày tạo</th>
+                <th>Thao tác</th>
               </tr>
             </thead>
 
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="8" className="admin-empty">
+                  <td colSpan="9" className="admin-empty">
                     Đang tải dữ liệu...
                   </td>
                 </tr>
@@ -134,11 +182,76 @@ function Users() {
                     </td>
 
                     <td>{formatDateTime(user.created_at)}</td>
+
+                    <td>
+                      <div className="admin-actions">
+                        {user.status === "active" && (
+                          <button
+                            className="admin-action-btn danger"
+                            disabled={updatingId === user.id}
+                            onClick={() =>
+                              updateUserStatus(
+                                user.id,
+                                "blocked"
+                              )
+                            }
+                          >
+                            Khóa
+                          </button>
+                        )}
+
+                        {user.status === "blocked" && (
+                          <button
+                            className="admin-action-btn primary"
+                            disabled={updatingId === user.id}
+                            onClick={() =>
+                              updateUserStatus(
+                                user.id,
+                                "active"
+                              )
+                            }
+                          >
+                            Mở khóa
+                          </button>
+                        )}
+
+                        {user.status === "pending" && (
+                          <>
+                            <button
+                              className="admin-action-btn primary"
+                              disabled={updatingId === user.id}
+                              onClick={() =>
+                                updateUserStatus(
+                                  user.id,
+                                  "active"
+                                )
+                              }
+                            >
+                              Duyệt
+                            </button>
+
+                            <button
+                              className="admin-action-btn danger"
+                              disabled={updatingId === user.id}
+                              onClick={() =>
+                                updateUserStatus(
+                                  user.id,
+                                  "blocked"
+                                )
+                              }
+                            >
+                              Khóa
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="admin-empty">
+                  <td colSpan="9" className="admin-empty">
                     Không có dữ liệu người dùng
                   </td>
                 </tr>
