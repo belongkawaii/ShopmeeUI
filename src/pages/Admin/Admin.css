@@ -420,6 +420,7 @@
 .status-rejected,
 .status-blocked,
 .status-hidden,
+.status-closed,
 .status-cancelled,
 .status-canceled,
 .status-unpaid {

@@ -122,6 +122,8 @@ async function reloadData() {
             <option value="pending">Chờ duyệt</option>
             <option value="active">Hoạt động</option>
             <option value="rejected">Từ chối</option>
+            <option value="blocked">Bị khóa</option>
+            <option value="closed">Đã đóng</option>
           </select>
         </label>
       </div>
@@ -175,29 +177,66 @@ async function reloadData() {
                     </td>
                     <td>
                       <div className="admin-actions">
-                        {shop.status !== "active" && (
+
+                        {/* SHOP CHỜ DUYỆT */}
+                        {shop.status === "pending" && (
+                          <>
+                            <button
+                              className="admin-action-btn primary"
+                              type="button"
+                              disabled={updatingId === shop.id}
+                              onClick={() => updateShopStatus(shop.id, "active")}
+                            >
+                              Duyệt
+                            </button>
+
+                            <button
+                              className="admin-action-btn danger"
+                              type="button"
+                              disabled={updatingId === shop.id}
+                              onClick={() => updateShopStatus(shop.id, "rejected")}
+                            >
+                              Từ chối
+                            </button>
+                          </>
+                        )}
+
+                        {/* SHOP ĐANG HOẠT ĐỘNG */}
+                        {shop.status === "active" && (
+                          <button
+                            className="admin-action-btn danger"
+                            type="button"
+                            disabled={updatingId === shop.id}
+                            onClick={() => updateShopStatus(shop.id, "blocked")}
+                          >
+                            Khóa
+                          </button>
+                        )}
+
+                        {/* SHOP BỊ KHÓA */}
+                        {shop.status === "blocked" && (
                           <button
                             className="admin-action-btn primary"
                             type="button"
                             disabled={updatingId === shop.id}
                             onClick={() => updateShopStatus(shop.id, "active")}
                           >
-                            Duyệt
+                            Mở khóa
                           </button>
                         )}
 
-                        {shop.status !== "rejected" && (
+                        {/* SHOP BỊ TỪ CHỐI */}
+                        {shop.status === "rejected" && (
                           <button
-                            className="admin-action-btn danger"
+                            className="admin-action-btn primary"
                             type="button"
                             disabled={updatingId === shop.id}
-                            onClick={() =>
-                              updateShopStatus(shop.id, "rejected")
-                            }
+                            onClick={() => updateShopStatus(shop.id, "active")}
                           >
-                            Từ chối
+                            Duyệt lại
                           </button>
                         )}
+
                       </div>
                     </td>
                   </tr>

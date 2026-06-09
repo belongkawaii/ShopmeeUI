@@ -9,7 +9,6 @@ function AdminSidebar() {
   function handleLogout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
-
     navigate("/login");
   }
 
@@ -39,6 +38,10 @@ function AdminSidebar() {
         <NavLink to="/admin/shops">Shops</NavLink>
 
         <NavLink to="/admin/orders">Orders</NavLink>
+
+        <NavLink to="/admin/products">Products</NavLink>
+        
+        <NavLink to="/admin/users">Users</NavLink>
       </nav>
 
       <button
