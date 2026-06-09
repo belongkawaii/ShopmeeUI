@@ -52,12 +52,6 @@ function Header() {
               </Link>
             </li>
 
-            <li>
-              <a href="#products" onClick={() => setIsMenuOpen(false)}>
-                Sản phẩm
-              </a>
-            </li>
-
             {!user ? (
               <li>
                 <Link

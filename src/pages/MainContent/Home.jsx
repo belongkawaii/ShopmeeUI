@@ -6,6 +6,7 @@ import "./Home.css";
 function Home() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [keyword, setKeyword] = useState("");
 
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(1);
@@ -36,6 +37,34 @@ function Home() {
       });
   }
 
+  function searchProducts(page = 1) {
+    setLoading(true);
+
+    fetch(
+      `http://127.0.0.1:8000/api/v1/products/search?keyword=${encodeURIComponent(
+        keyword
+      )}&page=${page}`
+    )
+      .then((response) => response.json())
+      .then((result) => {
+        setProducts(result.data.data);
+
+        setCurrentPage(
+          result.data.meta.current_page
+        );
+
+        setLastPage(
+          result.data.meta.last_page
+        );
+
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Lỗi tìm kiếm:", error);
+        setLoading(false);
+      });
+  }
+
   function handleViewDetail(id) {
     navigate(`/product/${id}`);
   }
@@ -56,6 +85,39 @@ function Home() {
   return (
     <>
       <Hero />
+
+      <div className="search-bar-container">
+        <input
+          type="text"
+          placeholder="Tìm kiếm sản phẩm..."
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          className="search-input"
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              searchProducts();
+            }
+          }}
+        />
+
+        <button
+          className="search-btn"
+          onClick={searchProducts}
+        >
+          🔍 Tìm kiếm
+        </button>
+
+        <button
+          className="reset-icon-btn"
+          title="Làm mới"
+          onClick={() => {
+            setKeyword("");
+            fetchProducts(1);
+          }}
+        >
+          ⟳
+        </button>
+      </div>
 
       <section className="products-section">
         <h2 className="products-title">
