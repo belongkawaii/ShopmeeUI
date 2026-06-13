@@ -7,6 +7,7 @@ import Home from "./pages/MainContent/Home";
 import AuthModal from "./pages/Auth/AuthModal";
 import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import Cart from "./pages/Cart/Cart";
+import Orders from "./pages/Orders/Orders";
 import AdminLayout from "./layouts/AdminLayout";
 
 function App() {
@@ -48,6 +49,16 @@ function App() {
           element={
             <MainLayout>
               <Cart />
+            </MainLayout>
+          }
+        />
+
+        {/* Orders */}
+        <Route
+          path="/orders"
+          element={
+            <MainLayout>
+              <Orders />
             </MainLayout>
           }
         />

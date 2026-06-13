@@ -108,6 +108,12 @@ function Header() {
             ) : (
               <>
                 <li>
+                  <Link to="/orders" onClick={() => setIsMenuOpen(false)}>
+                    📦 Đơn hàng
+                  </Link>
+                </li>
+
+                <li>
                   <span className="user-name">
                     Xin chào, {user.name || user.email}
                   </span>

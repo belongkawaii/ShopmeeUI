@@ -417,7 +417,7 @@ function Cart() {
         },
         body: JSON.stringify({
           user_address_id: selectedAddressId,
-          payment_method: paymentMethod,
+          payment_method: paymentMethod === "cod" ? "cash_on_delivery" : paymentMethod,
           description: orderDescription,
           cart_item_ids: selectedItems,
         }),
