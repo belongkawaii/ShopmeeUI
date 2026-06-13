@@ -71,7 +71,6 @@ function Orders() {
       });
       const result = await response.json();
       if (response.ok && result.success) {
-        alert("🎉 Đã hủy đơn hàng thành công!");
         setCancelModal({ isOpen: false, orderId: null, loading: false });
         fetchOrders(); // Reload orders
       } else {
@@ -335,29 +334,6 @@ function Orders() {
                   </div>
 
                   <div className="order-actions-btn-group">
-                    {/* Action: Simulate Payment */}
-                    {canSimulate && (
-                      <button
-                        type="button"
-                        className="btn-action btn-simulate-pay"
-                        onClick={() => handleSimulatePayment(order.id)}
-                        disabled={actionLoading[order.id]}
-                      >
-                        {actionLoading[order.id] ? "Đang xử lý..." : "⚡ Giả lập Chuyển tiền"}
-                      </button>
-                    )}
-
-                    {/* Action: Momo Verification Payment Redirect */}
-                    {order.payment_method === "momo" && isUnpaid && isPending && (
-                      <button
-                        type="button"
-                        className="btn-action btn-momo-pay"
-                        onClick={() => handleMomoRedirectSimulate(order)}
-                      >
-                        💳 Thanh toán ví MoMo
-                      </button>
-                    )}
-
                     {/* Action: Cancel Order */}
                     {canCancel && (
                       <button

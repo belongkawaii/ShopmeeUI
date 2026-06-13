@@ -79,7 +79,7 @@ function Home() {
 
   function formatPrice(price) {
     return (
-      Math.round(Number(price) * 26000).toLocaleString("vi-VN") + "₫"
+      Math.round(Number(price)).toLocaleString("vi-VN") + "₫"
     );
   }
 

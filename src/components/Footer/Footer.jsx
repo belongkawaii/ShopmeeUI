@@ -11,15 +11,17 @@ function Footer() {
         <div className="footer-section">
           <h3>Liên Kết</h3>
           <ul>
-            <li>Trang chủ</li>
-            <li>Sản phẩm</li>
+            <li>Facebook</li>
+            <li>X(Twitter)</li>
+            <li>Instagram</li>
+            <li><a href="https://www.youtube.com">YouTube</a></li>
             <li>Chính sách bảo hành</li>
           </ul>
         </div>
         <div className="footer-section">
           <h3>Liên Hệ</h3>
-          <p>Email: support@mystore.com</p>
-          <p>Hotline: 0123 456 789</p>
+          <p>Email: fakemadridofficial001@gmail.com</p>
+          <p>Hotline: 0387604029 </p>
         </div>
       </div>
       <div className="footer-bottom">
