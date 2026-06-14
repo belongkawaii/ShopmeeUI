@@ -8,13 +8,6 @@ function formatChatTime(timestamp) {
   });
 }
 
-function sleep(ms) {
-  return new Promise((r) => setTimeout(r, ms));
-}
-
-
-
-
 function loadChatMessages() {
   try {
     const stored = localStorage.getItem("adminChatMessages");
@@ -33,10 +26,18 @@ function saveChatMessages(messages) {
   }
 }
 
+const SUGGESTIONS = [
+  "Sản phẩm nào bán chạy nhất?",
+  "Chính sách đổi trả hàng ra sao?",
+  "Mất bao lâu để nhận hàng?",
+  "Làm thế nào để được miễn phí ship?"
+];
+
 function AdminChatBox() {
   const [messages, setMessages] = useState([]);
   const [messageText, setMessageText] = useState("");
-  const textareaRef = useRef(null);
+  const [isTyping, setIsTyping] = useState(false);
+  const inputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -51,7 +52,7 @@ function AdminChatBox() {
       {
         id: "welcome",
         sender: "system",
-        text: "Mee AI sẵn sàng hỗ trợ. Hỏi bất cứ điều gì bạn muốn.",
+        text: "Xin chào! Mee AI sẵn sàng hỗ trợ. Bạn có thể hỏi bất cứ câu hỏi nào về sản phẩm, chính sách cửa hàng hoặc đơn hàng của mình.",
         time: new Date().toISOString(),
       },
     ];
@@ -61,16 +62,16 @@ function AdminChatBox() {
   }, []);
 
   useEffect(() => {
-    // focus textarea on mount for better UX on small screens
-    if (textareaRef.current) textareaRef.current.focus();
+    // focus input on mount for better UX
+    if (inputRef.current) inputRef.current.focus();
   }, []);
 
   useEffect(() => {
-    // auto-scroll to bottom when new messages arrive
+    // auto-scroll to bottom when new messages arrive or typing state changes
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   function appendMessage(sender, text) {
     const msg = {
@@ -87,123 +88,146 @@ function AdminChatBox() {
     });
   }
 
-
   async function callGeminiApi(message) {
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      return "⚠️ Vui lòng đăng nhập để trò chuyện với Mee AI.";
+    }
+
     try {
       const res = await fetch("http://127.0.0.1:8000/api/v1/chat/gemini", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ message }),
       });
 
       const data = await res.json();
 
-      // extract reply from data.data.reply
-      return data.data?.reply || "Lỗi khi gọi API";
+      if (!res.ok) {
+        // If the server returns an error (like missing gemini api key 503 response)
+        return data.message || `Lỗi hệ thống (Mã lỗi: ${res.status}).`;
+      }
+
+      return data.data?.reply || data.message || "Không có phản hồi từ AI.";
     } catch (err) {
-      return null;
+      console.error(err);
+      return "⚠️ Không thể kết nối tới máy chủ AI. Vui lòng kiểm tra lại kết nối mạng của bạn.";
     }
+  }
+
+  async function sendMessage(text) {
+    appendMessage("admin", text);
+    setIsTyping(true);
+
+    const reply = await callGeminiApi(text);
+    setIsTyping(false);
+
+    appendMessage("system", reply);
   }
 
   async function handleSubmit(event) {
     event.preventDefault();
     const trimmed = messageText.trim();
-    if (!trimmed) return;
+    if (!trimmed || isTyping) return;
 
-
-
-    // append user's message
-
-    appendMessage("admin", trimmed);
     setMessageText("");
+    await sendMessage(trimmed);
+  }
 
-    // add a pending system message we can replace later
-    const pendingId = `${Date.now()}-pending-${Math.random()}`;
-    const pendingMsg = {
-      id: pendingId,
-      sender: "system",
-      text: "",
-      time: new Date().toISOString(),
-    };
-
-    // Use functional update so we don't depend on stale `messages` closure
-    setMessages((prev) => {
-      const nextMessages = [...prev, pendingMsg];
-      saveChatMessages(nextMessages);
-      return nextMessages;
-    });
-
-    // typing (dot) effect while waiting for AI response
-    const typingPhrases = ["Đang trả lời", "Đang trả lời.", "Đang trả lời..", "Đang trả lời..."];
-    let phraseIndex = 0;
-    let cancelled = false;
-
-    const typingTimer = setInterval(() => {
-      if (cancelled) return;
-      setMessages((prev) =>
-        prev.map((m) =>
-          m.id === pendingId
-            ? {
-                ...m,
-                text: typingPhrases[phraseIndex % typingPhrases.length],
-                time: m.time,
-              }
-            : m
-        )
-      );
-      phraseIndex += 1;
-    }, 350);
-
-    const reply = await callGeminiApi(trimmed);
-    cancelled = true;
-    clearInterval(typingTimer);
-
-    const replyText = reply || "Lỗi khi gọi API. Vui lòng thử lại.";
-
-    setMessages((prev) => {
-      const updated = prev.map((m) =>
-        m.id === pendingId ? { ...m, text: replyText, time: new Date().toISOString() } : m
-      );
-      saveChatMessages(updated);
-      return updated;
-    });
-
+  async function handleSuggestionClick(suggestion) {
+    if (isTyping) return;
+    await sendMessage(suggestion);
   }
 
   return (
     <div className="admin-panel admin-chatbox-panel">
       <div className="chatbox-body">
+        {/* Messages List */}
         <div className="chatbox-messages" role="log" aria-live="polite">
           {messages.map((message) => (
             <div
               key={message.id}
-              className={`chatbox-message chatbox-message-${message.sender}`}
+              className={`chatbox-message-row chatbox-message-${message.sender}`}
             >
-              <div className="chatbox-message-content">{message.text}</div>
-              <div className="chatbox-message-meta">
-                <span>
-                  {message.sender === "admin" ? "Bạn" : "Mee AI"}
-                </span>
-                <small>{formatChatTime(message.time)}</small>
+              <div className="chatbox-avatar">
+                {message.sender === "admin" ? "👤" : "✨"}
+              </div>
+              <div className="chatbox-message-wrapper">
+                <div className="chatbox-message-content">{message.text}</div>
+                <div className="chatbox-message-meta">
+                  <strong>{message.sender === "admin" ? "Bạn" : "Mee AI"}</strong>
+                  <small>{formatChatTime(message.time)}</small>
+                </div>
               </div>
             </div>
           ))}
+
+          {/* Typing Indicator */}
+          {isTyping && (
+            <div className="chatbox-message-row chatbox-message-system">
+              <div className="chatbox-avatar">✨</div>
+              <div className="chatbox-message-wrapper">
+                <div className="chatbox-message-content">
+                  <div className="typing-indicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+                <div className="chatbox-message-meta">
+                  <strong>Mee AI</strong>
+                  <small>Đang soạn...</small>
+                </div>
+              </div>
+            </div>
+          )}
           <div ref={messagesEndRef} />
         </div>
 
-        <form className="chatbox-form" onSubmit={handleSubmit}>
-          <textarea
-            ref={textareaRef}
-            rows="2"
-            value={messageText}
-            onChange={(e) => setMessageText(e.target.value)}
-            placeholder="Nhập tin nhắn..."
-            style={{ resize: "none" }}
-          />
-          <button type="submit" className="admin-action-btn primary">
-            Gửi
-          </button>
-        </form>
+        {/* Suggestion Prompts */}
+        {messages.length <= 1 && !isTyping && (
+          <div className="chatbox-suggestions-container">
+            {SUGGESTIONS.map((sug, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className="chatbox-suggestion-tag"
+                onClick={() => handleSuggestionClick(sug)}
+              >
+                {sug}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* Chat Input Bar */}
+        <div className="chatbox-form-wrapper">
+          <form className="chatbox-input-container" onSubmit={handleSubmit}>
+            <input
+              ref={inputRef}
+              type="text"
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              placeholder="Hỏi Mee AI bất cứ điều gì..."
+              className="chatbox-input"
+              disabled={isTyping}
+            />
+            <button
+              type="submit"
+              className="chatbox-send-btn"
+              disabled={!messageText.trim() || isTyping}
+              aria-label="Gửi tin nhắn"
+            >
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+              </svg>
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );
