@@ -59,7 +59,6 @@ function AuthMessage({ type, message }) {
   return <div className={`auth-message ${type}`}>{message}</div>;
 }
 
-// COMPONENT PASSWORD INPUT CÓ ICON CON MẮT
 function PasswordInput({ value, onChange, placeholder, name, minLength, required }) {
   const [showPassword, setShowPassword] = useState(false);
 

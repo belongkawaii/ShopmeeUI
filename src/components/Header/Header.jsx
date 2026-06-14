@@ -128,9 +128,9 @@ function Header() {
                 )}
 
                 <li>
-                  <span className="user-name">
+                  <Link to="/profile" onClick={() => setIsMenuOpen(false)} className="user-name">
                     Xin chào, {user.name || user.email}
-                  </span>
+                  </Link>
                 </li>
 
                 <li>
