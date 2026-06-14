@@ -62,6 +62,7 @@ function Header() {
   function handleLogout() {
     localStorage.removeItem("access_token");
     localStorage.removeItem("user");
+    localStorage.removeItem("adminChatMessages");
 
     navigate("/");
     window.location.reload();
