@@ -11,11 +11,11 @@ function Footer() {
         <div className="footer-section">
           <h3>Liên Kết</h3>
           <ul>
-            <li>Facebook</li>
-            <li>X(Twitter)</li>
-            <li>Instagram</li>
-            <li><a href="https://www.youtube.com">YouTube</a></li>
-            <li>Chính sách bảo hành</li>
+            <li><a href="https://www.facebook.com/lovell.06">Facebook</a></li>
+            <li><a href="https://twitter.com">X(Twitter)</a></li>
+            <li><a href="https://www.instagram.com/son.t.n.x/">Instagram</a></li>
+            <li><a href="https://www.youtube.com/@pcvn3226">YouTube</a></li>
+            <li><a href="/">Chính sách bảo hành</a></li>
           </ul>
         </div>
         <div className="footer-section">
@@ -25,7 +25,7 @@ function Footer() {
         </div>
       </div>
       <div className="footer-bottom">
-        &copy; 2024 MyStore. All rights reserved.
+        &copy; 2026 HCMUE. All rights reserved.
       </div>
     </footer>
   );

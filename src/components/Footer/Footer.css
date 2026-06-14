@@ -36,3 +36,8 @@
   font-size: 0.8rem;
   color: #888;
 }
+
+.footer-section a {
+  color: #38bdf8;
+  text-decoration: none;
+}

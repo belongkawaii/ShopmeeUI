@@ -485,7 +485,7 @@ function Cart() {
   }
 
   function formatMoney(amount) {
-    return Math.round(Number(amount) * 26000).toLocaleString("vi-VN") + " ₫";
+    return Math.round(Number(amount)).toLocaleString("vi-VN") + " ₫";
   }
 
   if (loading) {
