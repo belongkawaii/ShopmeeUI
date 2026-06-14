@@ -59,6 +59,55 @@ function AuthMessage({ type, message }) {
   return <div className={`auth-message ${type}`}>{message}</div>;
 }
 
+// COMPONENT PASSWORD INPUT CÓ ICON CON MẮT
+function PasswordInput({ value, onChange, placeholder, name, minLength, required }) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  return (
+    <div style={{ position: "relative", width: "100%" }}>
+      <input
+        type={showPassword ? "text" : "password"}
+        name={name}
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        minLength={minLength}
+        required={required}
+        style={{ paddingRight: "40px", width: "100%", boxSizing: "border-box" }} 
+      />
+      <button
+        type="button"
+        onClick={() => setShowPassword((prev) => !prev)}
+        style={{
+          position: "absolute",
+          right: "10px",
+          top: "50%",
+          transform: "translateY(-50%)",
+          background: "none",
+          border: "none",
+          cursor: "pointer",
+          color: "#666",
+          padding: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {showPassword ? (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        ) : (
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"></path>
+          </svg>
+        )}
+      </button>
+    </div>
+  );
+}
+
 function LoginForm({ onForgotPassword }) {
   const navigate = useNavigate();
 
@@ -116,12 +165,11 @@ function LoginForm({ onForgotPassword }) {
 
       <div className="input-group">
         <label>Mật khẩu</label>
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Nhập mật khẩu..."
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          required
+          required={true}
         />
       </div>
 
@@ -302,28 +350,26 @@ function ForgotPasswordForm({ onBackToLogin }) {
 
       <div className="input-group">
         <label>Mật khẩu mới</label>
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Nhập mật khẩu mới..."
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
           minLength={6}
-          required
+          required={true}
         />
       </div>
 
       <div className="input-group">
         <label>Xác nhận mật khẩu</label>
-        <input
-          type="password"
+        <PasswordInput
           placeholder="Nhập lại mật khẩu mới..."
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           minLength={6}
-          required
+          required={true}
         />
         {!passwordsMatch && (
-          <span className="field-warning">
+          <span className="field-warning" style={{ color: "red", fontSize: "0.85rem", marginTop: "5px", display: "block" }}>
             Mật khẩu xác nhận chưa trùng khớp.
           </span>
         )}
@@ -386,11 +432,15 @@ function RegisterForm({ onShowLogin }) {
     email: "",
     phone: "",
     password: "",
+    confirmPassword: "",
   });
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
+  const passwordsMatch =
+    formData.confirmPassword.length === 0 || formData.password === formData.confirmPassword;
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -404,9 +454,15 @@ function RegisterForm({ onShowLogin }) {
   async function handleRegister(e) {
     e.preventDefault();
 
-    setLoading(true);
     setError("");
     setSuccess("");
+
+    if (formData.password !== formData.confirmPassword) {
+      setError("Mật khẩu xác nhận chưa trùng khớp.");
+      return;
+    }
+
+    setLoading(true);
 
     try {
       await requestApi("/register", {
@@ -414,7 +470,7 @@ function RegisterForm({ onShowLogin }) {
         email: formData.email,
         phone: formData.phone,
         password: formData.password,
-        password_confirmation: formData.password,
+        password_confirmation: formData.confirmPassword,
       });
 
       setIsOtpVisible(true);
@@ -508,15 +564,31 @@ function RegisterForm({ onShowLogin }) {
 
       <div className="input-group">
         <label>Mật khẩu</label>
-        <input
-          type="password"
+        <PasswordInput
           name="password"
           placeholder="Tối thiểu 6 ký tự..."
           value={formData.password}
           onChange={handleChange}
           minLength={6}
-          required
+          required={true}
         />
+      </div>
+
+      <div className="input-group">
+        <label>Xác nhận mật khẩu</label>
+        <PasswordInput
+          name="confirmPassword"
+          placeholder="Nhập lại mật khẩu..."
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          minLength={6}
+          required={true}
+        />
+        {!passwordsMatch && (
+          <span className="field-warning" style={{ color: "red", fontSize: "0.85rem", marginTop: "5px", display: "block" }}>
+            Mật khẩu xác nhận chưa trùng khớp.
+          </span>
+        )}
       </div>
 
       {isOtpVisible && (
@@ -538,7 +610,7 @@ function RegisterForm({ onShowLogin }) {
       <button
         className="submit-btn register-submit"
         type="submit"
-        disabled={loading}
+        disabled={loading || !passwordsMatch}
       >
         {loading
           ? isOtpVisible
