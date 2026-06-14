@@ -11,10 +11,15 @@ const getAuthHeaders = () => {
 };
 
 export const registerShop = async (data) => {
+  const headers = getAuthHeaders();
+  const isFormData = data instanceof FormData;
+  if (isFormData) {
+    delete headers["Content-Type"];
+  }
   const response = await fetch(`${API_URL}/shops/register`, {
     method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
+    headers,
+    body: isFormData ? data : JSON.stringify(data),
   });
   return response.json();
 };

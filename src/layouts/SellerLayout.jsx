@@ -5,6 +5,7 @@ import Dashboard from "../pages/Seller/Dashboard";
 import Products from "../pages/Seller/Products";
 import Orders from "../pages/Seller/Orders";
 import EditProduct from "../pages/Seller/EditProduct";
+import SellerChat from "../pages/Seller/SellerChat";
 
 import "../pages/Seller/Seller.css";
 
@@ -19,6 +20,7 @@ function SellerLayout() {
           <Route path="products" element={<Products />} />
           <Route path="orders" element={<Orders />} />
           <Route path="edit-product" element={<EditProduct />} />
+          <Route path="chat" element={<SellerChat />} />
         </Routes>
       </div>
     </div>

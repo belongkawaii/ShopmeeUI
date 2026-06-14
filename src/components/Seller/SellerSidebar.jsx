@@ -48,6 +48,7 @@ function SellerSidebar() {
         <NavLink to="/seller/edit-product">✏️ Edit Sản phẩm</NavLink>
 
         <NavLink to="/seller/orders">📝 Đơn hàng</NavLink>
+        <NavLink to="/seller/chat">💬 Trợ lý AI</NavLink>
       </nav>
 
       <button

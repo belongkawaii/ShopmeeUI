@@ -7,8 +7,9 @@ function ShopRegister() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    logo_url: "",
   });
+  const [logoFile, setLogoFile] = useState(null);
+  const [logoPreview, setLogoPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -19,26 +20,42 @@ function ShopRegister() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
 
+    if (!logoFile) {
+      setError("Vui lòng chọn ảnh logo cho cửa hàng.");
+      setLoading(false);
+      return;
+    }
+
+    const data = new FormData();
+    data.append("name", formData.name);
+    data.append("description", formData.description);
+    data.append("logo", logoFile);
+
     try {
-      const response = await registerShop(formData);
+      const response = await registerShop(data);
       
       if (response.success) {
         // 1. Thay đổi thông báo thành công
         setSuccess("Xin chờ quản trị viên duyệt để có thể đăng ký bán hàng.");
         
-        // Lưu ý: Đã xóa phần tự động set role = 'seller' ở localStorage
-        // vì tài khoản cần admin duyệt ở phía Backend trước.
-
         // 2. Chuyển hướng về trang chủ "/" sau 2 giây
         setTimeout(() => {
           navigate("/");
-          window.location.reload(); // Giữ lại reload để reset lại các state chung (ví dụ: header)
+          window.location.reload(); 
         }, 2000); 
       } else {
         setError(response.message || "Đã xảy ra lỗi khi đăng ký.");
@@ -87,15 +104,31 @@ function ShopRegister() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="logo_url">URL Logo (Không bắt buộc)</label>
+            <label htmlFor="logo">Ảnh Logo cửa hàng *</label>
             <input
-              type="text"
-              id="logo_url"
-              name="logo_url"
-              value={formData.logo_url}
-              onChange={handleChange}
-              placeholder="https://example.com/logo.png"
+              type="file"
+              id="logo"
+              name="logo"
+              accept="image/*"
+              onChange={handleFileChange}
+              required
             />
+            {logoPreview && (
+              <div className="logo-preview-wrapper" style={{ marginTop: "12px" }}>
+                <img
+                  src={logoPreview}
+                  alt="Logo Preview"
+                  style={{
+                    maxWidth: "120px",
+                    maxHeight: "120px",
+                    borderRadius: "12px",
+                    border: "1px dashed var(--admin-blue, #2563eb)",
+                    padding: "4px",
+                    objectFit: "cover",
+                  }}
+                />
+              </div>
+            )}
           </div>
 
           <button type="submit" className="submit-btn" disabled={loading}>
