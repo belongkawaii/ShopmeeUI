@@ -47,10 +47,17 @@ export const getSellerProducts = async () => {
 };
 
 export const updateSellerProduct = async (id, data) => {
+  const headers = getAuthHeaders();
+  const isFormData = data instanceof FormData;
+  if (isFormData) {
+    delete headers["Content-Type"];
+  }
+  const method = isFormData ? "POST" : "PUT";
+
   const response = await fetch(`${API_URL}/seller/products/${id}`, {
-    method: "PUT",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
+    method,
+    headers,
+    body: isFormData ? data : JSON.stringify(data),
   });
   return response.json();
 };
@@ -80,8 +87,15 @@ export const updateSellerOrder = async (id, status) => {
   return response.json();
 };
 
-export const getSellerDashboardRevenue = async () => {
-  const response = await fetch(`${API_URL}/seller/dashboard/revenue`, {
+export const getSellerDashboardRevenue = async (startDate = "", endDate = "") => {
+  let url = `${API_URL}/seller/dashboard/revenue`;
+  const params = [];
+  if (startDate) params.push(`start_date=${startDate}`);
+  if (endDate) params.push(`end_date=${endDate}`);
+  if (params.length > 0) {
+    url += `?${params.join("&")}`;
+  }
+  const response = await fetch(url, {
     method: "GET",
     headers: getAuthHeaders(),
   });

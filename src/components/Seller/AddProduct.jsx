@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { addSellerProduct } from "../../pages/Seller/sellerApi";
+import { useSellerAlert } from "../../layouts/SellerLayout";
 
 function AddProduct() {
   const [loading, setLoading] = useState(false);
+  const { showAlert } = useSellerAlert();
 
   const [formData, setFormData] = useState({
     category_id: "",
@@ -83,12 +85,28 @@ function AddProduct() {
 
       const result = await addSellerProduct(form);
 
-      alert(result.message);
-
-      console.log(result);
+      if (result.success) {
+        await showAlert(result.message || "Đăng sản phẩm thành công!", "success");
+        setFormData({
+          category_id: "",
+          name: "",
+          description: "",
+          images: [],
+          variants: [
+            {
+              sku: "",
+              variant_name: "",
+              price: "",
+              stock_quantity: "",
+            },
+          ],
+        });
+      } else {
+        await showAlert(result.message || "Đăng sản phẩm thất bại.", "error");
+      }
     } catch (error) {
       console.error(error);
-      alert("Có lỗi xảy ra");
+      await showAlert("Có lỗi xảy ra khi thêm sản phẩm.", "error");
     } finally {
       setLoading(false);
     }

@@ -1,7 +1,7 @@
 import { NavLink, useNavigate, Link } from "react-router-dom";
 import "../../pages/Seller/Seller.css";
 
-function SellerSidebar() {
+function SellerSidebar({ isOpen, onClose }) {
   const navigate = useNavigate();
   
   const getStoredUser = () => {
@@ -21,7 +21,12 @@ function SellerSidebar() {
   }
 
   return (
-    <aside className="seller-sidebar">
+    <aside className={`seller-sidebar ${isOpen ? "open" : ""}`}>
+      {/* Close button for mobile */}
+      <button className="sidebar-close-btn" onClick={onClose} type="button">
+        ✕
+      </button>
+
       <div className="seller-brand">
         <span className="seller-brand-mark">S</span>
         <div>
@@ -39,16 +44,16 @@ function SellerSidebar() {
       </div>
 
       <nav className="seller-nav">
-        <NavLink to="/seller" end>
+        <NavLink to="/seller" end onClick={onClose}>
           📊 Thống kê
         </NavLink>
 
-        <NavLink to="/seller/products">📦 Sản phẩm</NavLink>
+        <NavLink to="/seller/products" onClick={onClose}>📦 Sản phẩm</NavLink>
 
-        <NavLink to="/seller/edit-product">✏️ Edit Sản phẩm</NavLink>
+        <NavLink to="/seller/edit-product" onClick={onClose}>✏️ Edit Sản phẩm</NavLink>
 
-        <NavLink to="/seller/orders">📝 Đơn hàng</NavLink>
-        <NavLink to="/seller/chat">💬 Trợ lý AI</NavLink>
+        <NavLink to="/seller/orders" onClick={onClose}>📝 Đơn hàng</NavLink>
+        <NavLink to="/seller/chat" onClick={onClose}>💬 Trợ lý AI</NavLink>
       </nav>
 
       <button
