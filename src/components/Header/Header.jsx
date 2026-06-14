@@ -113,6 +113,20 @@ function Header() {
                   </Link>
                 </li>
 
+                {user.role === "admin" || user.role === "seller" ? (
+                  <li>
+                    <Link to="/seller" onClick={() => setIsMenuOpen(false)}>
+                      🏪 Quản lý shop
+                    </Link>
+                  </li>
+                ) : (
+                  <li>
+                    <Link to="/shop/register" onClick={() => setIsMenuOpen(false)}>
+                      🏪 Đăng ký shop
+                    </Link>
+                  </li>
+                )}
+
                 <li>
                   <span className="user-name">
                     Xin chào, {user.name || user.email}
