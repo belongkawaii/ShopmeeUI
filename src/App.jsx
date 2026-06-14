@@ -9,6 +9,8 @@ import ProductDetail from "./pages/ProductDetail/ProductDetail";
 import Cart from "./pages/Cart/Cart";
 import Orders from "./pages/Orders/Orders";
 import AdminLayout from "./layouts/AdminLayout";
+import ShopRegister from "./pages/ShopRegister/ShopRegister";
+import Seller from "./layouts/SellerLayout";
 
 function App() {
   return (
@@ -21,6 +23,14 @@ function App() {
         <Route
           path="/admin/*"
           element={<AdminLayout />}
+        />
+
+        {/* Seller */}
+        <Route
+          path="/seller/*"
+          element={
+              <Seller />
+          }
         />
 
         {/* Home */}
@@ -59,6 +69,16 @@ function App() {
           element={
             <MainLayout>
               <Orders />
+            </MainLayout>
+          }
+        />
+
+          {/* Shop Register */}
+        <Route
+          path="/shop/register"
+          element={
+            <MainLayout>
+              <ShopRegister />
             </MainLayout>
           }
         />
