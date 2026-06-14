@@ -1,3 +1,17 @@
+
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
+
+
 .auth-page {
   min-height: 100vh;
   display: flex;
@@ -231,6 +245,8 @@
   color: #9ca3af;
   cursor: not-allowed;
 }
+
+
 
 @media (max-width: 480px) {
   .auth-container {
