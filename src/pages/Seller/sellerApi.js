@@ -52,6 +52,14 @@ export const deleteSellerProduct = async (id) => {
   return response.json();
 };
 
+export const getSellerOrders = async () => {
+  const response = await fetch(`${API_URL}/seller/orders`, {
+    method: "GET",
+    headers: getAuthHeaders(),
+  });
+  return response.json();
+};
+
 export const updateSellerOrder = async (id, status) => {
   const response = await fetch(`${API_URL}/seller/orders/${id}`, {
     method: "PATCH",
