@@ -1,4 +1,5 @@
-const API_URL = "http://127.0.0.1:8000/api/v1";
+import { API_BASE_URL } from "../../config";
+const API_URL = API_BASE_URL;
 
 const getAuthHeaders = () => {
   const token = localStorage.getItem("access_token");
@@ -19,10 +20,15 @@ export const registerShop = async (data) => {
 };
 
 export const addSellerProduct = async (data) => {
+  const headers = getAuthHeaders();
+  const isFormData = data instanceof FormData;
+  if (isFormData) {
+    delete headers["Content-Type"];
+  }
   const response = await fetch(`${API_URL}/products`, {
     method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify(data),
+    headers,
+    body: isFormData ? data : JSON.stringify(data),
   });
   return response.json();
 };

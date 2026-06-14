@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Header.css";
 import logoImg from "../../assets/Logo-removebg.png";
+import { API_BASE_URL } from "../../config";
 
 function getStoredUser() {
   try {
@@ -29,7 +30,7 @@ function Header() {
     if (!token) return;
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/cart/count", {
+      const response = await fetch(`${API_BASE_URL}/cart/count`, {
         headers: {
           "Accept": "application/json",
           "Authorization": `Bearer ${token}`

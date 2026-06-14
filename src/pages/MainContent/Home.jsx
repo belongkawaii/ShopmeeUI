@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Hero from "../../components/Banner/Hero";
 import "./Home.css";
+import { API_BASE_URL } from "../../config";
 
 function Home() {
   const [products, setProducts] = useState([]);
@@ -19,7 +20,7 @@ function Home() {
   function fetchProducts(page = 1) {
     setLoading(true);
 
-    fetch(`http://127.0.0.1:8000/api/v1/products?page=${page}`)
+    fetch(`${API_BASE_URL}/products?page=${page}`)
       .then(function (response) {
         return response.json();
       })
@@ -45,7 +46,7 @@ function Home() {
     setLoading(true);
 
     fetch(
-      `http://127.0.0.1:8000/api/v1/products/search?keyword=${encodeURIComponent(
+      `${API_BASE_URL}/products/search?keyword=${encodeURIComponent(
         keyword
       )}&page=${page}`
     )

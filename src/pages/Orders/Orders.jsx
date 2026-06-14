@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Orders.css";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+import { API_BASE_URL, STORAGE_BASE_URL } from "../../config";
 
 function Orders() {
   const navigate = useNavigate();
@@ -167,7 +167,7 @@ function Orders() {
     if (item.product_variant?.product?.images?.length > 0) {
       const img = item.product_variant.product.images[0].image;
       if (img.startsWith("http")) return img;
-      return `http://127.0.0.1:8000/storage/${img}`;
+      return `${STORAGE_BASE_URL}/${img}`;
     }
     return "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&auto=format&fit=crop&q=60";
   }
