@@ -199,7 +199,7 @@ function Home() {
                       </h3>
 
                       <div className="rating">
-                        ⭐ 4.8
+                        ⭐ {product.rating_count > 0 ? `${product.rating_avg} (${product.rating_count})` : "Chưa có đánh giá"}
                       </div>
 
                       <div className="price-box">
