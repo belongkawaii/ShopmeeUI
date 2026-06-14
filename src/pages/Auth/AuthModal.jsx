@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthModal.css";
 import bannerImg from "../../assets/hero-banner.png";
-
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+import { API_BASE_URL } from "../../config";
 const OTP_COOLDOWN_SECONDS = 300;
 
 async function requestApi(path, body) {
@@ -59,7 +58,6 @@ function AuthMessage({ type, message }) {
   return <div className={`auth-message ${type}`}>{message}</div>;
 }
 
-// COMPONENT PASSWORD INPUT CÓ ICON CON MẮT
 function PasswordInput({ value, onChange, placeholder, name, minLength, required }) {
   const [showPassword, setShowPassword] = useState(false);
 

@@ -31,7 +31,6 @@ function Products() {
     <div>
       <div className="seller-header">
         <h1>Quản lý Sản phẩm</h1>
-        <button className="seller-btn seller-btn-primary">+ Thêm Sản Phẩm</button>
       </div>
 
       <div className="seller-card">

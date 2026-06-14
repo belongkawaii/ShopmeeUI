@@ -11,6 +11,7 @@ import Orders from "./pages/Orders/Orders";
 import AdminLayout from "./layouts/AdminLayout";
 import ShopRegister from "./pages/ShopRegister/ShopRegister";
 import Seller from "./layouts/SellerLayout";
+import Profile from "./pages/Profile/Profile";
 
 function App() {
   return (
@@ -30,6 +31,14 @@ function App() {
           path="/seller/*"
           element={
               <Seller />
+          }
+        />
+
+        {/* Profile */}
+        <Route
+          path="/profile"
+          element={
+              <Profile />
           }
         />
 

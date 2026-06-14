@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./ProductDetail.css";
+import { API_BASE_URL } from "../../config";
 
 function ProductDetail() {
   const { id } = useParams();
@@ -17,7 +18,7 @@ function ProductDetail() {
     async function loadProduct() {
       try {
         const response = await fetch(
-          `http://127.0.0.1:8000/api/v1/products/${id}`
+          `${API_BASE_URL}/products/${id}`
         );
 
         const result = await response.json();
@@ -70,7 +71,7 @@ function ProductDetail() {
     setLoginMessage("");
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/v1/cart/add", {
+      const response = await fetch(`${API_BASE_URL}/cart/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
