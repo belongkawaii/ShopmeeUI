@@ -25,6 +25,21 @@ function Orders() {
   // Action loading states by order ID
   const [actionLoading, setActionLoading] = useState({});
 
+  // Review modal state
+  const [reviewModal, setReviewModal] = useState({
+    isOpen: false,
+    orderId: null,
+    productId: null,
+    productName: "",
+    productImage: "",
+    variantName: "",
+    rating: 5,
+    comment: "",
+    imageFile: null,
+    imagePreview: null,
+    loading: false,
+  });
+
   useEffect(() => {
     if (!token) {
       navigate("/login");
@@ -162,6 +177,7 @@ function Orders() {
       pending: "Chờ xử lý",
       processing: "Đang xử lý",
       shipping: "Đang giao",
+      delivered: "Đã giao",
       completed: "Đã giao",
       cancelled: "Đã hủy",
     };
@@ -175,6 +191,94 @@ function Orders() {
       refunded: "Đã hoàn tiền",
     };
     return statusMap[status] || status;
+  }
+
+  // Review modal actions
+  function openReviewModal(orderId, item) {
+    const productId = item.product_variant?.product?.id;
+    const productName = item.product_variant?.product?.name || "Sản phẩm";
+    const productImage = getProductImage(item);
+    const variantName = item.product_variant?.variant_name || "";
+    
+    setReviewModal({
+      isOpen: true,
+      orderId,
+      productId,
+      productName,
+      productImage,
+      variantName,
+      rating: 5,
+      comment: "",
+      imageFile: null,
+      imagePreview: null,
+      loading: false,
+    });
+  }
+
+  function handleRatingSelect(stars) {
+    setReviewModal(prev => ({ ...prev, rating: stars }));
+  }
+
+  function handleReviewImageChange(e) {
+    const file = e.target.files[0];
+    if (file) {
+      setReviewModal(prev => ({
+        ...prev,
+        imageFile: file,
+        imagePreview: URL.createObjectURL(file)
+      }));
+    }
+  }
+
+  async function handleSubmitReview(e) {
+    e.preventDefault();
+    setReviewModal(prev => ({ ...prev, loading: true }));
+
+    const formData = new FormData();
+    formData.append("rating", reviewModal.rating);
+    if (reviewModal.comment) {
+      formData.append("comment", reviewModal.comment);
+    }
+    if (reviewModal.imageFile) {
+      formData.append("image", reviewModal.imageFile);
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/orders/${reviewModal.orderId}/products/${reviewModal.productId}/review`, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+      if (response.ok && result.success) {
+        alert("🎉 Đánh giá sản phẩm thành công!");
+        setReviewModal({
+          isOpen: false,
+          orderId: null,
+          productId: null,
+          productName: "",
+          productImage: "",
+          variantName: "",
+          rating: 5,
+          comment: "",
+          imageFile: null,
+          imagePreview: null,
+          loading: false,
+        });
+        fetchOrders();
+      } else {
+        alert(result.message || "Gửi đánh giá thất bại.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Lỗi kết nối khi gửi đánh giá.");
+    } finally {
+      setReviewModal(prev => ({ ...prev, loading: false }));
+    }
   }
 
   function getPaymentMethodText(method) {
@@ -210,7 +314,7 @@ function Orders() {
     { label: "Chờ xử lý", value: "pending" },
     { label: "Đang xử lý", value: "processing" },
     { label: "Đang giao", value: "shipping" },
-    { label: "Đã giao", value: "completed" },
+    { label: "Đã giao", value: "delivered" },
     { label: "Đã hủy", value: "cancelled" },
   ];
 
@@ -270,7 +374,7 @@ function Orders() {
             const isUnpaid = order.payment_status === "pending";
             const isPending = order.status === "pending";
             const canCancel = isPending;
-            const canSimulate = isUnpaid && order.payment_method !== "cash_on_delivery" && isPending;
+            const isDelivered = order.status === "delivered" || order.status === "completed";
 
             return (
               <div key={order.id} className="order-card">
@@ -311,9 +415,29 @@ function Orders() {
                           <span className="item-sku-text">SKU: {item.product_variant.sku}</span>
                         )}
                       </div>
-                      <div className="item-price-box">
-                        <span className="item-unit-price">{formatMoney(item.unit_price)}</span>
-                        <span className="item-quantity-text">x{item.quantity}</span>
+                      <div className="item-price-box-wrapper">
+                        <div className="item-price-box">
+                          <span className="item-unit-price">{formatMoney(item.unit_price)}</span>
+                          <span className="item-quantity-text">x{item.quantity}</span>
+                        </div>
+                        {isDelivered && (
+                          <div className="item-review-action">
+                            {item.is_reviewed ? (
+                              <span className="reviewed-label">✓ Đã đánh giá</span>
+                            ) : (
+                              <button
+                                type="button"
+                                className="btn-review-item"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  openReviewModal(order.id, item);
+                                }}
+                              >
+                                ✍️ Đánh giá
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -381,6 +505,124 @@ function Orders() {
                 {cancelModal.loading ? "Đang hủy..." : "Đồng ý Hủy"}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Modal */}
+      {reviewModal.isOpen && (
+        <div className="review-modal-overlay">
+          <div className="review-modal-box">
+            <button 
+              className="review-modal-close-btn"
+              onClick={() => setReviewModal(prev => ({ ...prev, isOpen: false }))}
+              disabled={reviewModal.loading}
+            >
+              ✕
+            </button>
+            
+            <h3>Đánh giá sản phẩm</h3>
+            
+            <div className="review-modal-product-summary">
+              <img src={reviewModal.productImage} alt={reviewModal.productName} />
+              <div className="product-details">
+                <h4>{reviewModal.productName}</h4>
+                {reviewModal.variantName && (
+                  <span className="variant-label">Phân loại hàng: {reviewModal.variantName}</span>
+                )}
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmitReview} className="review-form">
+              {/* Star Rating Selector */}
+              <div className="rating-select-group">
+                <label>Chất lượng sản phẩm:</label>
+                <div className="stars-selector">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      className={`star-btn ${star <= reviewModal.rating ? "selected" : ""}`}
+                      onClick={() => handleRatingSelect(star)}
+                      disabled={reviewModal.loading}
+                    >
+                      ★
+                    </button>
+                  ))}
+                  <span className="rating-text-hint">
+                    {reviewModal.rating === 1 && "Tệ"}
+                    {reviewModal.rating === 2 && "Không hài lòng"}
+                    {reviewModal.rating === 3 && "Bình thường"}
+                    {reviewModal.rating === 4 && "Hài lòng"}
+                    {reviewModal.rating === 5 && "Tuyệt vời"}
+                  </span>
+                </div>
+              </div>
+
+              {/* Comment Input */}
+              <div className="form-group">
+                <label htmlFor="comment">Chia sẻ nhận xét của bạn:</label>
+                <textarea
+                  id="comment"
+                  rows="4"
+                  placeholder="Hãy chia sẻ những điều bạn thích về sản phẩm này nhé..."
+                  value={reviewModal.comment}
+                  onChange={(e) => setReviewModal(prev => ({ ...prev, comment: e.target.value }))}
+                  disabled={reviewModal.loading}
+                  maxLength={1000}
+                ></textarea>
+              </div>
+
+              {/* Image Upload */}
+              <div className="form-group">
+                <label>Thêm hình ảnh sản phẩm (nếu có):</label>
+                <div className="image-upload-wrapper">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    id="review-image-input"
+                    onChange={handleReviewImageChange}
+                    disabled={reviewModal.loading}
+                    style={{ display: "none" }}
+                  />
+                  <label htmlFor="review-image-input" className="image-upload-btn">
+                    📷 Tải ảnh lên
+                  </label>
+                  
+                  {reviewModal.imagePreview && (
+                    <div className="image-preview-container">
+                      <img src={reviewModal.imagePreview} alt="Preview" />
+                      <button
+                        type="button"
+                        className="remove-preview-btn"
+                        onClick={() => setReviewModal(prev => ({ ...prev, imageFile: null, imagePreview: null }))}
+                        disabled={reviewModal.loading}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="review-modal-actions">
+                <button
+                  type="button"
+                  className="btn-cancel"
+                  onClick={() => setReviewModal(prev => ({ ...prev, isOpen: false }))}
+                  disabled={reviewModal.loading}
+                >
+                  Trở lại
+                </button>
+                <button
+                  type="submit"
+                  className="btn-submit"
+                  disabled={reviewModal.loading}
+                >
+                  {reviewModal.loading ? "Đang gửi..." : "Hoàn thành"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
