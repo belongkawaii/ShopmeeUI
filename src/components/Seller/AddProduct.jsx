@@ -20,8 +20,12 @@ function AddProduct() {
   });
 
   const categories = [
-    { id: 1, name: "Thời trang nam" },
-    { id: 2, name: "Thời trang nữ" },
+    { id: 1, name: "Thiết bị điện tử" },
+    { id: 2, name: "Thời trang" },
+    { id: 3, name: "Nhà cửa & Đời sống" },
+    { id: 4, name: "Sức khỏe & Làm đẹp" },
+    { id: 5, name: "Sách" },
+    { id: 6, name: "Thể thao & Dã ngoại" },
   ];
 
   const handleVariantChange = (index, field, value) => {
