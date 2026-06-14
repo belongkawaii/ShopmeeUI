@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from "react";
+import { API_BASE_URL } from "../../config";
 
 function formatChatTime(timestamp) {
   const date = new Date(timestamp);
@@ -95,7 +96,7 @@ function AdminChatBox() {
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/v1/chat/gemini", {
+      const res = await fetch(`${API_BASE_URL}/chat/gemini`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

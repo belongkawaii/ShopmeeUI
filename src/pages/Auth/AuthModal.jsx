@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AuthModal.css";
 import bannerImg from "../../assets/hero-banner.png";
-
-const API_BASE_URL = "http://127.0.0.1:8000/api/v1";
+import { API_BASE_URL } from "../../config";
 const OTP_COOLDOWN_SECONDS = 300;
 
 async function requestApi(path, body) {
