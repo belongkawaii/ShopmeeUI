@@ -5,6 +5,7 @@ export const AdminAPI = {
   shops: "/admin/shops",
   products: "/admin/products",
   orders: "/admin/orders",
+  revenue: "/admin/revenue",
 };
 
 export function getAdminUser() {

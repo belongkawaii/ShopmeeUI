@@ -1,6 +1,15 @@
 import { useEffect, useState } from "react";
 import { adminRequest } from "./adminApi";
 
+const currencyFormat = new Intl.NumberFormat("vi-VN", {
+  style: "currency",
+  currency: "VND",
+  maximumFractionDigits: 0,
+});
+
+function formatCurrency(value) {
+  return currencyFormat.format(value || 0);
+}
 
 function Dashboard() {
   const [stats, setStats] = useState({
@@ -8,6 +17,10 @@ function Dashboard() {
     activeShops: 0,
     pendingShops: 0,
     orders: 0,
+    totalRevenue: 0,
+    totalCommission: 0,
+    totalOrdersCompleted: 0,
+    totalProductsSold: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -18,7 +31,7 @@ function Dashboard() {
       setError("");
 
       try {
-        const [shopsResult, activeShopsResult, pendingShopsResult, ordersResult] =
+        const [shopsResult, activeShopsResult, pendingShopsResult, ordersResult, revenueResult] =
           await Promise.all([
             adminRequest("/admin/shops", { params: { limit: 1 } }),
             adminRequest("/admin/shops", {
@@ -28,6 +41,7 @@ function Dashboard() {
               params: { status: "pending", limit: 1 },
             }),
             adminRequest("/admin/orders", { params: { limit: 1 } }),
+            adminRequest("/admin/revenue"),
           ]);
 
         setStats({
@@ -35,6 +49,10 @@ function Dashboard() {
           activeShops: activeShopsResult.meta?.total || 0,
           pendingShops: pendingShopsResult.meta?.total || 0,
           orders: ordersResult.meta?.total || 0,
+          totalRevenue: revenueResult.data?.total_revenue || 0,
+          totalCommission: revenueResult.data?.total_admin_commission || 0,
+          totalOrdersCompleted: revenueResult.data?.total_orders_completed || 0,
+          totalProductsSold: revenueResult.data?.total_products_sold || 0,
         });
       } catch (err) {
         setError(err.message);
@@ -68,6 +86,47 @@ function Dashboard() {
       tone: "rose",
     },
   ];
+
+  const [activeChart, setActiveChart] = useState("total");
+
+  const startYear = new Date().getMonth() >= 5 ? new Date().getFullYear() : new Date().getFullYear() - 1;
+  const startDate = new Date(startYear, 5, 1);
+  const currentDate = new Date();
+
+  const revenueMonths = [];
+  const buildDate = new Date(startDate);
+  while (buildDate <= currentDate) {
+    revenueMonths.push(new Date(buildDate));
+    buildDate.setMonth(buildDate.getMonth() + 1);
+  }
+
+  const formatMonthLabel = (date) => {
+    const month = date.getMonth() + 1;
+    const year = String(date.getFullYear()).slice(-2);
+    return `${month}/${year}`;
+  };
+
+  const monthlyTotalRevenue = revenueMonths.map((_, index) =>
+    Math.round(stats.totalRevenue * ((index + 1) / revenueMonths.length))
+  );
+  const monthlyAdminRevenue = revenueMonths.map((_, index) =>
+    Math.round(stats.totalCommission * ((index + 1) / revenueMonths.length))
+  );
+
+  const activeValues = activeChart === "admin" ? monthlyAdminRevenue : monthlyTotalRevenue;
+  const maxValue = Math.max(...activeValues);
+  const valueMax = maxValue > 0 ? maxValue : 1;
+  const svgWidth = 600;
+  const svgHeight = 260;
+  const chartPadding = 40;
+  const chartWidth = svgWidth - chartPadding * 2;
+  const chartHeight = svgHeight - chartPadding * 2;
+
+  const linePoints = activeValues.map((value, index) => {
+    const x = chartPadding + (chartWidth * index) / Math.max(revenueMonths.length - 1, 1);
+    const y = chartPadding + chartHeight * (1 - value / valueMax);
+    return `${x},${y}`;
+  });
 
   return (
     <div className="admin-page">
@@ -114,6 +173,31 @@ function Dashboard() {
             <strong>{loading ? "..." : stats.orders}</strong>
           </div>
         </div>
+      </div>
+
+      <div className="admin-panel admin-revenue-panel">
+        <div className="admin-panel-header">
+          <div>
+            <h2>Doanh thu toàn sàn</h2>
+            <p>So sánh doanh thu toàn sàn và doanh thu admin theo VND.</p>
+          </div>
+        </div>
+
+        <div className="admin-summary-list admin-revenue-grid">
+          <div>
+            <span>Tổng doanh thu</span>
+            <strong>{loading ? "..." : formatCurrency(stats.totalRevenue)}</strong>
+          </div>
+          <div>
+            <span>Doanh thu admin</span>
+            <strong>{loading ? "..." : formatCurrency(stats.totalCommission)}</strong>
+          </div>
+          <div>
+            <span>Đơn hàng hoàn tất</span>
+            <strong>{loading ? "..." : stats.totalOrdersCompleted}</strong>
+          </div>
+        </div>
+
       </div>
     </div>
   );
