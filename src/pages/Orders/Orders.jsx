@@ -140,7 +140,7 @@ function Orders() {
 
   // Currency formater (matches formatMoney in Cart.jsx)
   function formatMoney(amount) {
-    return Math.round(Number(amount) * 26000).toLocaleString("vi-VN") + " ₫";
+    return Math.round(Number(amount)).toLocaleString("vi-VN") + " ₫";
   }
 
   function formatDate(dateStr) {
