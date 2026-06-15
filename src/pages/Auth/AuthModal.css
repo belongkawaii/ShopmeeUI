@@ -1,0 +1,266 @@
+
+input::-ms-reveal,
+input::-ms-clear {
+  display: none !important;
+}
+
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-credentials-auto-fill-button {
+  visibility: hidden;
+  display: none !important;
+  pointer-events: none;
+}
+
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 32px 16px;
+  background-color: #111827;
+}
+
+.blur-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 1;
+}
+
+.auth-container {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 420px);
+  max-height: calc(100vh - 64px);
+  overflow-y: auto;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.auth-tabs {
+  display: flex;
+  position: relative;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #eee;
+}
+
+.tab-btn {
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-weight: bold;
+  color: #888;
+  transition: color 0.3s;
+}
+
+.tab-btn.active {
+  color: #0088cc;
+}
+
+.tab-indicator {
+  position: absolute;
+  bottom: -2px;
+  width: 50%;
+  height: 2px;
+  background: #0088cc;
+  transition: 0.3s ease-in-out;
+}
+
+.tab-indicator.left {
+  left: 0;
+}
+
+.tab-indicator.right {
+  left: 50%;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.form-title {
+  margin: 0 0 8px;
+  font-size: 1.2rem;
+  color: #1f2937;
+}
+
+.form-hint {
+  margin: 0 0 18px;
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.input-group {
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #333;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #0088cc;
+  box-shadow: 0 0 0 3px rgba(0, 136, 204, 0.14);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background: #0088cc;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: #0075ad;
+}
+
+.submit-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.register-submit {
+  background: #28a745;
+}
+
+.register-submit:hover:not(:disabled) {
+  background: #218838;
+}
+
+.auth-footer-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 20px;
+  align-items: center;
+}
+
+.auth-footer-links.single-link {
+  justify-content: center;
+}
+
+.small-link {
+  font-size: 0.85rem;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.small-link:hover {
+  color: rgb(81, 206, 247);
+  cursor: pointer;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.auth-message {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.auth-message.error {
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+}
+
+.auth-message.success {
+  color: #166534;
+  background: #dcfce7;
+  border: 1px solid #bbf7d0;
+}
+
+.field-warning {
+  display: block;
+  margin-top: 6px;
+  color: #dc2626;
+  font-size: 0.82rem;
+}
+
+.otp-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.resend-otp-btn {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #0088cc;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resend-otp-btn:disabled {
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+
+
+@media (max-width: 480px) {
+  .auth-container {
+    padding: 1.4rem;
+  }
+
+  .auth-footer-links,
+  .otp-input-row {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .resend-otp-btn {
+    text-align: left;
+  }
+}

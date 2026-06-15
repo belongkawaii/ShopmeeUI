@@ -1,0 +1,104 @@
+.edit-products-page {
+  padding: 30px;
+  min-height: 100vh;
+  background: #f5f7fa;
+}
+
+.edit-products-container {
+  max-width: 1200px;
+  margin: auto;
+}
+
+.tabs {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 10px;
+  background: #e9ecef;
+  font-weight: 600;
+}
+
+.tab-btn.active {
+  background: #0d6efd;
+  color: white;
+}
+
+.content-card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+}
+
+.product-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.input-group input,
+.input-group textarea,
+.input-group select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.variant-card {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr) auto;
+  gap: 10px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+}
+
+.preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.preview-grid img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.submit-btn,
+.secondary-btn,
+.danger-btn {
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submit-btn {
+  background: #0d6efd;
+  color: white;
+}
+
+.secondary-btn {
+  background: #198754;
+  color: white;
+}
+
+.danger-btn {
+  background: #dc3545;
+  color: white;
+}
